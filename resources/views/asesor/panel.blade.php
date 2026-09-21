@@ -582,6 +582,7 @@
             <h3 class="font-black text-gray-800 mb-4 border-b pb-2 text-xl">Editar Oferta Formativa</h3>
             <form id="formEditCarrera" method="POST">
                 @csrf
+                @method('PUT')
                 <div class="mb-4">
                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Tipo de Formación</label>
                     <select name="tipo" id="edit_car_tipo" required class="w-full text-sm p-3 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-blue-500">
@@ -653,6 +654,7 @@
             <h3 class="font-black text-gray-800 mb-4 border-b pb-2 text-xl">Editar Módulo</h3>
             <form id="formEditModulo" method="POST">
                 @csrf
+                @method('PUT')
                 <div class="mb-4">
                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Oferta Formativa</label>
                     <select name="carrera_id" id="edit_mod_carrera" required class="w-full text-sm p-3 border border-gray-300 rounded-xl bg-gray-50">
@@ -691,6 +693,7 @@
             <h3 class="font-black text-gray-800 mb-4 border-b pb-2 text-xl">Editar Docente</h3>
             <form id="formEditDocente" method="POST">
                 @csrf
+                @method('PUT')
                 <div class="mb-4">
                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Nombre Completo</label>
                     <input type="text" name="name" id="edit_doc_name" required class="w-full text-sm p-3 border border-gray-300 rounded-xl bg-gray-50">
@@ -733,6 +736,7 @@
             <h3 class="font-black text-gray-800 mb-4 border-b pb-2 text-xl">Editar Asignación</h3>
             <form id="formEditAsignacion" method="POST">
                 @csrf
+                @method('PUT')
                 <div class="mb-4">
                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Fecha Inicio</label>
                     <input type="date" name="fecha_inicio" id="edit_asig_inicio" required class="w-full text-sm p-3 border border-gray-300 rounded-xl bg-gray-50">

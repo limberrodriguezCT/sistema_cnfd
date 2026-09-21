@@ -19,41 +19,65 @@
         </div>
     </div>
 
-    <h3 class="font-black text-gray-800 text-2xl mb-6 border-b pb-2 border-gray-200">Módulos en Curso</h3>
+    @php
+        $hoy = \Carbon\Carbon::now()->toDateString();
+        
+        $enCurso = $asignacionesActivas->filter(function($asig) use ($hoy) {
+            return $asig->fecha_inicio <= $hoy;
+        })->sortBy('fecha_inicio');
+
+        $proximos = $asignacionesActivas->filter(function($asig) use ($hoy) {
+            return $asig->fecha_inicio > $hoy;
+        })->sortBy('fecha_inicio');
+
+        $asignacionesOrdenadas = $enCurso->concat($proximos);
+        $asignacionesCerradas = $asignacionesCerradas->sortByDesc('fecha_fin');
+    @endphp
+
+    <h3 class="font-black text-gray-800 text-2xl mb-6 border-b pb-2 border-gray-200">Módulos en Curso y Próximos</h3>
     
-    @if(count($asignacionesActivas) > 0)
-        <!-- La clase items-stretch asegura que todas las tarjetas de la misma fila tengan la misma altura total -->
+    @if(count($asignacionesOrdenadas) > 0)
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12 items-stretch" id="contenedor-modulos">
-            @foreach($asignacionesActivas as $asignacion)
-                <div class="modulo-card bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col group h-full" data-filtro="{{ strtolower($asignacion->modulo->nombre . ' ' . $asignacion->grupo->codigo_grupo . ' ' . ($asignacion->grupo->carrera->nombre ?? '')) }}">
+            @foreach($asignacionesOrdenadas as $asignacion)
+                @php
+                    $esProximo = $asignacion->fecha_inicio > $hoy;
+                    $bgHeader = $esProximo ? 'from-gray-500 to-gray-600' : 'from-[#2a348e] to-indigo-700';
+                    $badgeBg = $esProximo ? 'bg-amber-500' : 'bg-emerald-500';
+                    $badgeText = $esProximo ? 'PRÓXIMO' : 'ACTIVO';
+                @endphp
+                
+                <div class="modulo-card bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col group h-full {{ $esProximo ? 'opacity-80' : '' }}" data-filtro="{{ strtolower($asignacion->modulo->nombre . ' ' . $asignacion->grupo->codigo_grupo . ' ' . ($asignacion->grupo->carrera->nombre ?? '')) }}">
                     
-                    <!-- Cabecera Azul Fija: Reducimos padding a p-6 y ajustamos altura a h-60 para evitar cortes -->
-                    <div class="bg-gradient-to-r from-[#2a348e] to-indigo-700 p-6 text-white relative overflow-hidden flex flex-col h-60 shrink-0">
+                    <div class="bg-gradient-to-r {{ $bgHeader }} p-6 text-white relative overflow-hidden flex flex-col h-60 shrink-0">
                         <div class="absolute -right-6 -top-6 opacity-10 group-hover:scale-110 transition-transform duration-500">
                             <svg class="w-40 h-40" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"></path></svg>
                         </div>
                         
-                        <!-- Badges superiores -->
                         <div class="flex justify-between items-start relative z-10 shrink-0">
                             <span class="bg-white/10 border border-white/20 text-white text-[10px] font-black px-3 py-1.5 rounded-lg uppercase tracking-wider backdrop-blur-sm">{{ strtoupper($asignacion->grupo->codigo_grupo) }}</span>
-                            <span class="bg-emerald-500 text-white text-[10px] font-black px-3 py-1.5 rounded-lg uppercase tracking-wider shadow-sm">Activo</span>
+                            <span class="{{ $badgeBg }} text-white text-[10px] font-black px-3 py-1.5 rounded-lg uppercase tracking-wider shadow-sm">{{ $badgeText }}</span>
                         </div>
                         
-                        <!-- Contenedor central flexible para el título (Evita que line-clamp corte las letras) -->
                         <div class="relative z-10 flex-grow flex items-center py-2">
                             <h3 class="font-black text-xl lg:text-2xl leading-snug line-clamp-3" title="{{ $asignacion->modulo->nombre }}">
                                 {{ $asignacion->modulo->nombre }}
                             </h3>
                         </div>
                         
-                        <!-- Pie de la cabecera (Fecha/Semestre) -->
-                        <p class="text-blue-200 text-sm font-bold flex items-center gap-2 relative z-10 shrink-0">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                            {{ $asignacion->modulo->semestre }}
+                        <p class="text-white/80 text-sm font-bold flex flex-col gap-1 relative z-10 shrink-0">
+                            <span class="flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                {{ $asignacion->modulo->semestre }}
+                            </span>
+                            @if($esProximo)
+                            <span class="flex items-center gap-2 text-amber-200 text-xs">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                Inicia el {{ \Carbon\Carbon::parse($asignacion->fecha_inicio)->format('d/m/Y') }}
+                            </span>
+                            @endif
                         </p>
                     </div>
 
-                    <!-- Cuerpo Blanco Flexible -->
                     <div class="p-6 flex-grow flex flex-col justify-between bg-white">
                         <div class="mb-8">
                             <div class="mb-6">
@@ -68,9 +92,15 @@
                             </div>
                         </div>
                         
-                        <a href="{{ route('docente.espacio', $asignacion->id) }}" class="block w-full text-center bg-[#2a348e] hover:bg-blue-800 text-white font-black py-4 px-4 rounded-xl transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
-                            Ingresar al Espacio
-                        </a>
+                        @if($esProximo)
+                            <button disabled class="block w-full text-center bg-gray-200 text-gray-500 font-black py-4 px-4 rounded-xl transition-all shadow-sm cursor-not-allowed">
+                                Disponible Próximamente
+                            </button>
+                        @else
+                            <a href="{{ route('docente.espacio', $asignacion->id) }}" class="block w-full text-center bg-[#2a348e] hover:bg-blue-800 text-white font-black py-4 px-4 rounded-xl transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                                Ingresar al Espacio
+                            </a>
+                        @endif
                     </div>
                 </div>
             @endforeach
@@ -129,7 +159,6 @@
         });
         document.getElementById('mensaje-vacio').style.display = mostrados === 0 ? 'block' : 'none';
         
-        // Ocultar el contenedor de la grid si no hay elementos mostrados para que no quede el espacio en blanco
         document.getElementById('contenedor-modulos').style.display = mostrados === 0 ? 'none' : 'grid';
     }
 </script>

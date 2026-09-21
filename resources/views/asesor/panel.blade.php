@@ -180,66 +180,95 @@
                         
                         @foreach($carreras as $index => $carrera)
                             @php $color = $colores[$index % count($colores)]; @endphp
-                            @if(count($carrera->grupos) > 0 || count($carrera->modulos) > 0)
-                                <div class="border {{ $color['border'] }} rounded-xl p-6 bg-white shadow-sm hover:shadow-md transition-shadow flex flex-col h-full">
-                                    <div class="flex justify-between items-start mb-4 border-b border-gray-100 pb-3">
-                                        <div class="flex items-center gap-2">
-                                            <h4 class="font-black text-lg {{ $color['text'] }}">{{ $carrera->nombre }}</h4>
-                                            <button onclick="editarCarrera({{ $carrera->id }}, '{{ addslashes($carrera->nombre) }}', '{{ $carrera->tipo }}')" class="text-gray-400 hover:{{ $color['text'] }} transition-colors" title="Editar Oferta">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                                            </button>
-                                        </div>
-                                        <span class="text-[10px] font-black uppercase px-2 py-1 rounded-md {{ $color['badge'] }} shrink-0">{{ $carrera->tipo ?? 'CARRERA' }}</span>
+                            <div class="border {{ $color['border'] }} rounded-xl p-6 bg-white shadow-sm hover:shadow-md transition-shadow flex flex-col h-full">
+                                <div class="flex justify-between items-start mb-4 border-b border-gray-100 pb-3">
+                                    <div class="flex items-center gap-2">
+                                        <h4 class="font-black text-lg {{ $color['text'] }}">{{ $carrera->nombre }}</h4>
+                                        <button onclick="editarCarrera({{ $carrera->id }}, '{{ addslashes($carrera->nombre) }}', '{{ $carrera->tipo }}')" class="text-gray-400 hover:{{ $color['text'] }} transition-colors" title="Editar Oferta">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                        </button>
+                                        <button onclick="confirmarEliminarCarrera({{ $carrera->id }}, '{{ addslashes($carrera->nombre) }}')" class="text-gray-400 hover:text-red-500 transition-colors" title="Eliminar Oferta">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                        </button>
                                     </div>
-                                    <div class="grid grid-cols-2 gap-6 flex-grow">
-                                        <div>
-                                            <h5 class="text-xs font-bold text-gray-400 uppercase mb-3">Grupos Activos</h5>
-                                            <ul class="text-sm space-y-2">
-                                                @if(count($carrera->grupos) > 0)
-                                                    @foreach($carrera->grupos as $grupo)
-                                                        <li class="font-bold bg-gray-100 px-2 py-1 rounded text-gray-700 mb-1">{{ strtoupper($grupo->codigo_grupo) }}</li>
-                                                    @endforeach
-                                                @else
-                                                    <li class="text-gray-400 italic text-xs">Sin grupos</li>
-                                                @endif
-                                            </ul>
-                                        </div>
-                                        <div class="flex flex-col h-full">
-                                            <h5 class="text-xs font-bold text-gray-400 uppercase mb-3">Módulos</h5>
-                                            @if(count($carrera->modulos) > 0)
-                                                <div class="space-y-4 max-h-[300px] overflow-y-auto pr-2">
-                                                    @foreach($carrera->modulos->groupBy('semestre') as $semestre => $modulosSemestre)
-                                                        <div>
-                                                            <h6 class="text-[10px] font-black {{ $color['text'] }} uppercase tracking-widest mb-2 border-b {{ $color['border'] }} pb-1">{{ $semestre }}</h6>
-                                                            <ul class="text-sm space-y-2">
-                                                                @foreach($modulosSemestre as $modulo)
-                                                                    <li class="{{ $color['bg'] }} p-2 rounded-lg border border-gray-200 font-semibold text-xs text-gray-700 flex justify-between items-center group">
-                                                                        <div class="flex flex-col gap-1">
-                                                                            <span>{{ $modulo->nombre }}</span>
-                                                                            @php
-                                                                                $badgeColor = 'bg-gray-200 text-gray-700';
-                                                                                if($modulo->tipo_modulo == 'Técnicos') $badgeColor = 'bg-blue-100 text-blue-700';
-                                                                                if($modulo->tipo_modulo == 'Transversales') $badgeColor = 'bg-emerald-100 text-emerald-700';
-                                                                                if($modulo->tipo_modulo == 'Optativos') $badgeColor = 'bg-amber-100 text-amber-700';
-                                                                            @endphp
-                                                                            <span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded w-fit {{ $badgeColor }}">{{ $modulo->tipo_modulo ?? 'Técnicos' }}</span>
-                                                                        </div>
-                                                                        <button onclick="editarModulo({{ $modulo->id }}, '{{ addslashes($modulo->nombre) }}', '{{ addslashes($modulo->semestre) }}', {{ $modulo->carrera_id }}, '{{ $modulo->tipo_modulo }}')" class="text-gray-400 hover:text-blue-600 opacity-50 group-hover:opacity-100 transition-opacity" title="Editar Módulo">
-                                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                                                                        </button>
-                                                                    </li>
-                                                                @endforeach
-                                                            </ul>
+                                    <span class="text-[10px] font-black uppercase px-2 py-1 rounded-md {{ $color['badge'] }} shrink-0">{{ $carrera->tipo ?? 'CARRERA' }}</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-6 flex-grow">
+                                    <div>
+                                        <h5 class="text-xs font-bold text-gray-400 uppercase mb-3">Grupos Activos</h5>
+                                        <ul class="text-sm space-y-2">
+                                            @if(count($carrera->grupos) > 0)
+                                                @foreach($carrera->grupos as $grupo)
+                                                    <li class="font-bold bg-gray-100 px-2 py-1 rounded text-gray-700 mb-1 flex justify-between items-center group">
+                                                        <span>{{ strtoupper($grupo->codigo_grupo) }}</span>
+                                                        <div class="flex gap-2">
+                                                            <button type="button" onclick="confirmarEdicionGrupo({{ $grupo->id }}, '{{ $grupo->codigo_grupo }}', '{{ $grupo->modalidad }}', {{ $grupo->meta }}, {{ $grupo->anio_academico }}, {{ $carrera->id }})" class="text-gray-400 hover:text-amber-500 opacity-50 group-hover:opacity-100 transition-opacity" title="Editar Grupo">
+                                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                                            </button>
+                                                            <button type="button" onclick="confirmarEliminarGrupo({{ $grupo->id }}, '{{ $grupo->codigo_grupo }}')" class="text-gray-400 hover:text-red-500 opacity-50 group-hover:opacity-100 transition-opacity" title="Eliminar Grupo">
+                                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                                            </button>
                                                         </div>
-                                                    @endforeach
-                                                </div>
+                                                    </li>
+                                                @endforeach
                                             @else
-                                                <p class="text-gray-400 italic text-xs">Sin módulos registrados.</p>
+                                                <li class="text-gray-400 italic text-xs">Sin grupos</li>
                                             @endif
-                                        </div>
+                                        </ul>
+                                    </div>
+                                    <div class="flex flex-col h-full">
+                                        <h5 class="text-xs font-bold text-gray-400 uppercase mb-3">Módulos</h5>
+                                        @if(count($carrera->modulos) > 0)
+                                            <div class="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                                                @php
+                                                    $modulosAgrupados = $carrera->modulos->sortBy(function($m) {
+                                                        $semestres = ['I Semestre' => 1, 'II Semestre' => 2];
+                                                        $tipos = ['Transversales' => 1, 'Técnicos' => 2, 'Optativos' => 3];
+                                                        $s = $semestres[$m->semestre] ?? 99;
+                                                        $t = $tipos[$m->tipo_modulo] ?? 99;
+                                                        return sprintf('%02d-%02d-%s', $s, $t, $m->nombre);
+                                                    })->groupBy('semestre')->sortBy(function($item, $key) {
+                                                        $semestres = ['I Semestre' => 1, 'II Semestre' => 2];
+                                                        return $semestres[$key] ?? 99;
+                                                    });
+                                                @endphp
+
+                                                @foreach($modulosAgrupados as $semestre => $modulosSemestre)
+                                                    <div>
+                                                        <h6 class="text-[10px] font-black {{ $color['text'] }} uppercase tracking-widest mb-2 border-b {{ $color['border'] }} pb-1">{{ $semestre }}</h6>
+                                                        <ul class="text-sm space-y-2">
+                                                            @foreach($modulosSemestre as $modulo)
+                                                                <li class="{{ $color['bg'] }} p-2 rounded-lg border border-gray-200 font-semibold text-xs text-gray-700 flex justify-between items-center group">
+                                                                    <div class="flex flex-col gap-1">
+                                                                        <span>{{ $modulo->nombre }}</span>
+                                                                        @php
+                                                                            $badgeColor = 'bg-gray-200 text-gray-700';
+                                                                            if($modulo->tipo_modulo == 'Técnicos') $badgeColor = 'bg-blue-100 text-blue-700';
+                                                                            if($modulo->tipo_modulo == 'Transversales') $badgeColor = 'bg-emerald-100 text-emerald-700';
+                                                                            if($modulo->tipo_modulo == 'Optativos') $badgeColor = 'bg-amber-100 text-amber-700';
+                                                                        @endphp
+                                                                        <span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded w-fit {{ $badgeColor }}">{{ $modulo->tipo_modulo ?? 'Técnicos' }}</span>
+                                                                    </div>
+                                                                    <div class="flex gap-2">
+                                                                        <button onclick="editarModulo({{ $modulo->id }}, '{{ addslashes($modulo->nombre) }}', '{{ addslashes($modulo->semestre) }}', {{ $modulo->carrera_id }}, '{{ $modulo->tipo_modulo }}')" class="text-gray-400 hover:text-blue-600 opacity-50 group-hover:opacity-100 transition-opacity" title="Editar Módulo">
+                                                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                                                        </button>
+                                                                        <button onclick="confirmarEliminarModulo({{ $modulo->id }}, '{{ addslashes($modulo->nombre) }}')" class="text-gray-400 hover:text-red-500 opacity-50 group-hover:opacity-100 transition-opacity" title="Eliminar Módulo">
+                                                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                                                        </button>
+                                                                    </div>
+                                                                </li>
+                                                            @endforeach
+                                                        </ul>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <p class="text-gray-400 italic text-xs">Sin módulos registrados.</p>
+                                        @endif
                                     </div>
                                 </div>
-                            @endif
+                            </div>
                         @endforeach
                     </div>
                 @else
@@ -447,7 +476,7 @@
         </div>
     </div>
 
-    <!-- PESTAÑA DE INTERESADOS WEB (VISTA LIMPIA CON BOTÓN DE EXPORTAR) -->
+    <!-- PESTAÑA DE INTERESADOS WEB -->
     <div id="tab-interesados" class="tab-content hidden space-y-8">
         <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
             <div class="p-6 border-b bg-emerald-50 flex flex-col md:flex-row justify-between items-center gap-4">
@@ -567,6 +596,53 @@
                 <div class="flex gap-3">
                     <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-md">Actualizar</button>
                     <button type="button" onclick="document.getElementById('modalEditCarrera').classList.add('hidden')" class="flex-1 bg-gray-200 text-gray-800 font-bold py-3 rounded-xl">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL EDITAR GRUPO -->
+    <div id="modalEditGrupo" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md">
+            <h3 class="font-black text-gray-800 mb-4 border-b pb-2 text-xl flex items-center gap-2">
+                <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                Editar Grupo
+            </h3>
+            <form id="formEditGrupo" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="mb-4">
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Oferta Formativa</label>
+                    <select name="carrera_id" id="edit_gru_carrera" required class="w-full text-sm p-3 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-amber-500">
+                        @foreach($carreras as $c)
+                            <option value="{{ $c->id }}">{{ $c->nombre }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Código de Grupo</label>
+                    <input type="text" name="codigo_grupo" id="edit_gru_codigo" required class="w-full text-sm p-3 border border-gray-300 rounded-xl bg-gray-50 uppercase focus:ring-2 focus:ring-amber-500">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Modalidad</label>
+                    <select name="modalidad" id="edit_gru_modalidad" required class="w-full text-sm p-3 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-amber-500">
+                        <option value="Presencial">Presencial</option>
+                        <option value="Virtual">Virtual</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mb-5">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Meta</label>
+                        <input type="number" name="meta" id="edit_gru_meta" required class="w-full text-sm p-3 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-amber-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Año</label>
+                        <input type="number" name="anio_academico" id="edit_gru_anio" required class="w-full text-sm font-black text-gray-800 p-3 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-amber-500">
+                    </div>
+                </div>
+                <div class="flex gap-3">
+                    <button type="submit" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl shadow-md transition-colors">Confirmar Cambios</button>
+                    <button type="button" onclick="document.getElementById('modalEditGrupo').classList.add('hidden')" class="flex-1 bg-gray-200 text-gray-800 font-bold py-3 rounded-xl">Cancelar</button>
                 </div>
             </form>
         </div>
@@ -803,6 +879,109 @@
         document.getElementById('modalEditModulo').classList.remove('hidden');
     }
 
+    // ==========================================
+    // ALERTAS DE ELIMINACIÓN
+    // ==========================================
+    function confirmarEliminarCarrera(id, nombre) {
+        Swal.fire({
+            title: '¿Eliminar Oferta Formativa?',
+            text: `Está a punto de eliminar "${nombre}". Se borrarán también sus grupos y módulos asociados. Esta acción es irreversible.`,
+            icon: 'error',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/asesor/carrera/${id}`;
+                form.innerHTML = '@csrf @method("DELETE")';
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
+    }
+
+    function confirmarEliminarGrupo(id, codigo) {
+        Swal.fire({
+            title: '¿Eliminar Grupo?',
+            text: `Está a punto de eliminar el grupo "${codigo}". Se perderán las asignaciones y los estudiantes matriculados en él quedarán sin grupo. Esta acción es irreversible.`,
+            icon: 'error',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/asesor/grupo/${id}`;
+                form.innerHTML = '@csrf @method("DELETE")';
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
+    }
+
+    function confirmarEliminarModulo(id, nombre) {
+        Swal.fire({
+            title: '¿Eliminar Módulo?',
+            text: `Está a punto de eliminar el módulo "${nombre}". Esta acción es irreversible y podría afectar las asignaciones vinculadas a él.`,
+            icon: 'error',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/asesor/modulo/${id}`;
+                form.innerHTML = '@csrf @method("DELETE")';
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
+    }
+
+    // ==========================================
+    // ALERTA Y FUNCIÓN PARA EDITAR GRUPOS
+    // ==========================================
+    function confirmarEdicionGrupo(id, codigo, modalidad, meta, anio, carrera_id) {
+        Swal.fire({
+            title: '¡Advertencia!',
+            text: 'Modificar el código o configuración de un grupo es una acción irreversible y puede afectar la estructura de las asignaciones actuales. ¿Está seguro de continuar?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#f59e0b',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Sí, editar',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                editarGrupo(id, codigo, modalidad, meta, anio, carrera_id);
+            }
+        });
+    }
+
+    function editarGrupo(id, codigo, modalidad, meta, anio, carrera_id) {
+        document.getElementById('formEditGrupo').action = `/asesor/grupo/${id}`;
+        document.getElementById('edit_gru_codigo').value = codigo;
+        document.getElementById('edit_gru_modalidad').value = modalidad;
+        document.getElementById('edit_gru_meta').value = meta;
+        document.getElementById('edit_gru_anio').value = anio;
+        document.getElementById('edit_gru_carrera').value = carrera_id;
+        document.getElementById('modalEditGrupo').classList.remove('hidden');
+    }
+
     function editarDocente(id, name, email, contrato, inicio, fin) {
         document.getElementById('formEditDocente').action = `/asesor/docente/${id}`;
         document.getElementById('edit_doc_name').value = name;
@@ -847,26 +1026,19 @@
         document.getElementById('modalExportar').classList.remove('hidden');
     }
 
-    // ==========================================
-    // FUNCIÓN PARA FILTRAR MÓDULOS POR GRUPO/CARRERA
-    // ==========================================
     function filtrarModulosPorGrupo() {
         let grupoSelect = document.getElementById('grupo_select');
         let moduloSelect = document.getElementById('modulo_select');
         let options = moduloSelect.querySelectorAll('.modulo-option');
         
-        // Obtener el ID de la carrera asociada al grupo seleccionado
         let carreraId = grupoSelect.options[grupoSelect.selectedIndex].getAttribute('data-carrera');
         
-        // Restablecer el selector de módulos
         moduloSelect.value = ""; 
         
         if (!carreraId) {
-            // Si no hay grupo seleccionado, deshabilitar el selector de módulos
             moduloSelect.disabled = true;
             options.forEach(opt => opt.classList.add('hidden'));
         } else {
-            // Habilitar y filtrar
             moduloSelect.disabled = false;
             let encontrados = false;
             
@@ -879,7 +1051,6 @@
                 }
             });
             
-            // Opcional: si la carrera no tiene módulos, volver a bloquear
             if(!encontrados) {
                 moduloSelect.disabled = true;
                 moduloSelect.options[0].text = "Sin módulos registrados";

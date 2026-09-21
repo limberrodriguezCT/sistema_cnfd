@@ -38,7 +38,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/estudiantes/exportar/{grupo_id}', [AsesorController::class, 'exportarListado'])->name('exportar_listado');
         Route::get('/exportar-global', [AsesorController::class, 'exportarConsolidadoGlobal'])->name('exportar_global');
         
-        // RUTA NUEVA: Exportación de Interesados
         Route::get('/interesados/exportar', [AsesorController::class, 'exportarInteresados'])->name('exportar_interesados');
         
         Route::post('/estudiante', [AsesorController::class, 'storeEstudianteManual'])->name('store_estudiante');
@@ -47,18 +46,23 @@ Route::middleware('auth')->group(function () {
         Route::post('/estudiantes/importar', [AsesorController::class, 'importarEstudiantes'])->name('importar_estudiantes');
         
         Route::post('/carrera', [AsesorController::class, 'storeCarrera'])->name('store_carrera');
-        Route::post('/carrera/{id}', [AsesorController::class, 'updateCarrera'])->name('update_carrera');
+        Route::put('/carrera/{id}', [AsesorController::class, 'updateCarrera'])->name('update_carrera');
+        Route::delete('/carrera/{id}', [AsesorController::class, 'destroyCarrera'])->name('destroy_carrera');
         
         Route::post('/modulo', [AsesorController::class, 'storeModulo'])->name('store_modulo');
-        Route::post('/modulo/{id}', [AsesorController::class, 'updateModulo'])->name('update_modulo');
+        Route::put('/modulo/{id}', [AsesorController::class, 'updateModulo'])->name('update_modulo');
+        Route::delete('/modulo/{id}', [AsesorController::class, 'destroyModulo'])->name('destroy_modulo');
+        
         Route::post('/grupo', [AsesorController::class, 'storeGrupo'])->name('store_grupo');
+        Route::put('/grupo/{id}', [AsesorController::class, 'updateGrupo'])->name('update_grupo');
+        Route::delete('/grupo/{id}', [AsesorController::class, 'destroyGrupo'])->name('destroy_grupo');
         
         Route::post('/docente', [AsesorController::class, 'storeDocente'])->name('store_docente');
-        Route::post('/docente/{id}', [AsesorController::class, 'updateDocente'])->name('update_docente');
+        Route::put('/docente/{id}', [AsesorController::class, 'updateDocente'])->name('update_docente');
         Route::post('/docente/{id}/toggle', [AsesorController::class, 'toggleDocente'])->name('toggle_docente');
         
         Route::post('/asignacion', [AsesorController::class, 'storeAsignacion'])->name('store_asignacion');
-        Route::post('/asignacion/{id}', [AsesorController::class, 'updateAsignacion'])->name('update_asignacion');
+        Route::put('/asignacion/{id}', [AsesorController::class, 'updateAsignacion'])->name('update_asignacion');
         Route::post('/asignacion/{id}/toggle', [AsesorController::class, 'toggleAsignacion'])->name('toggle_asignacion');
         
         Route::get('/reporte/{asignacion_id}', [AsesorController::class, 'reporteModulo'])->name('reporte');

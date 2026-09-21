@@ -611,9 +611,6 @@ class AsesorController extends Controller
         exit;
     }
 
-    // ==========================================
-    // NUEVO MÉTODO: EXPORTAR INTERESADOS A EXCEL
-    // ==========================================
     public function exportarInteresados(Request $request) {
         $anioActivo = session('anio_activo', date('Y'));
         
@@ -747,6 +744,23 @@ class AsesorController extends Controller
         return back()->with('success', 'Módulo Actualizado'); 
     }
     
+    public function updateGrupo(Request $request, $id) {
+        $request->validate([
+            'codigo_grupo' => 'required|string|max:255',
+            'modalidad' => 'required|string|max:255',
+            'meta' => 'required|integer|min:1',
+            'carrera_id' => 'required|exists:carreras,id',
+            'anio_academico' => 'required|integer'
+        ]);
+        
+        $grupo = Grupo::findOrFail($id);
+        $datos = $request->all();
+        $datos['codigo_grupo'] = mb_strtoupper($request->codigo_grupo, 'UTF-8');
+        
+        $grupo->update($datos);
+        return back()->with('success', 'Grupo actualizado exitosamente.');
+    }
+
     public function storeGrupo(Request $request) { 
         $request->validate([
             'codigo_grupo' => 'required|string|max:255|unique:grupos', 
@@ -822,5 +836,24 @@ class AsesorController extends Controller
         $semaforoData = null; if ($fechaCorte && file_exists(storage_path("app/semaforos/asig_{$asignacion_id}_{$fechaCorte}.json"))) { $semaforoData = json_decode(file_get_contents(storage_path("app/semaforos/asig_{$asignacion_id}_{$fechaCorte}.json")), true); } 
         $fechasConsolidado = Asistencia::where('grupo_id', $asignacion->grupo_id)->select('fecha')->distinct()->orderBy('fecha', 'desc')->pluck('fecha')->toArray(); 
         return view('asesor.reporte', compact('asignacion', 'fechasSemaforo', 'fechaCorte', 'semaforoData', 'fechasConsolidado')); 
+    }
+
+    // Funciones de Eliminación
+    public function destroyCarrera($id) {
+        $carrera = Carrera::findOrFail($id);
+        $carrera->delete();
+        return back()->with('success', 'Oferta formativa eliminada correctamente.');
+    }
+
+    public function destroyGrupo($id) {
+        $grupo = Grupo::findOrFail($id);
+        $grupo->delete();
+        return back()->with('success', 'Grupo eliminado correctamente.');
+    }
+
+    public function destroyModulo($id) {
+        $modulo = Modulo::findOrFail($id);
+        $modulo->delete();
+        return back()->with('success', 'Módulo eliminado correctamente.');
     }
 }

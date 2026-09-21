@@ -78,7 +78,7 @@ class AcademicoSeeder extends Seeder
             Modulo::create([
                 'carrera_id' => $tete->id,
                 'nombre' => $mod['nombre'],
-                'semestre' => $mod['semestre'],
+                'semestre' => $mod['semestre'], 
                 'orden' => $mod['orden']
             ]);
         }

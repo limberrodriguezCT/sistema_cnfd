@@ -16,10 +16,7 @@
     
     <header class="bg-[#2a348e] text-white pt-20 pb-16 px-6">
         <div class="max-w-4xl mx-auto text-center">
-            <h1 class="text-4xl md:text-6xl font-black mb-6 tracking-tight">Oferta Formativa CNFD Olof Palme <span class="text-blue-300">{{ $anioProyectado }}</span></h1>
-            <p class="text-lg md:text-xl text-blue-100 mb-10 leading-relaxed">
-                Descubre una formación diseñada por y para docentes. Fortalece tus habilidades en el aula y domina nuevas herramientas tecnológicas para inspirar a tus estudiantes.
-            </p>
+            <h1 class="text-4xl md:text-6xl font-black mb-6 tracking-tight">Oferta Formativa Centro Nacional de Formación Docente Olof Palme <span class="text-blue-300">{{ $anioProyectado }}</span></h1>
             <div class="flex flex-col sm:flex-row justify-center gap-4 mb-10">
                 <button onclick="switchTab('presencial')" id="btn-presencial" class="tab-btn active px-6 py-3 text-lg font-bold text-white bg-white/5 hover:bg-white/10 rounded-xl transition-all border-b-4 border-transparent">Modalidad Presencial</button>
                 <button onclick="switchTab('virtual')" id="btn-virtual" class="tab-btn px-6 py-3 text-lg font-bold text-white bg-white/5 hover:bg-white/10 rounded-xl transition-all border-b-4 border-transparent">Modalidad Virtual</button>
@@ -40,9 +37,7 @@
                 <div class="flex flex-col md:flex-row gap-10 items-center">
                     <div class="flex-1">
                         <h2 class="text-4xl font-black text-[#2a348e] mb-6">Centros de Formación Presencial</h2>
-                        <p class="text-gray-600 text-lg leading-relaxed">
-                            Aprovecha nuestros laboratorios tecnológicos y espacios didácticos interactuando directamente con facilitadores y colegas. Nuestras instalaciones están listas para recibirte y enriquecer tu experiencia de aprendizaje.
-                        </p>
+    
                     </div>
                     <div class="flex-1 grid grid-cols-1 gap-5 w-full">
                         <!-- Mapa Olof Palme -->
@@ -104,7 +99,7 @@
                 <div class="max-w-3xl">
                     <h2 class="text-4xl font-black text-[#2a348e] mb-6">Aprende a tu propio ritmo</h2>
                     <p class="text-gray-600 text-lg leading-relaxed mb-6">
-                        La modalidad virtual está pensada para adaptarse a tu tiempo personal y laboral. Tendrás acceso constante a la plataforma con recursos interactivos y el apoyo continuo de un tutor que guiará tu aprendizaje paso a paso.
+                        La modalidad virtual está pensada para adaptarse a tu tiempo personal y laboral. Tendrás acceso constante a la plataforma con recursos interactivos y el apoyo continuo de docentes formadores que guiarán tu aprendizaje.
                     </p>
                 </div>
             </div>
@@ -151,8 +146,8 @@
         <!-- FORMULARIO DE INTERESADOS -->
         <div class="mt-20 bg-gradient-to-br from-emerald-800 to-teal-900 rounded-3xl p-8 md:p-14 shadow-xl text-white max-w-4xl mx-auto">
             <div class="text-center mb-10">
-                <h3 class="text-3xl font-black mb-3">Únete a nuestra formación en {{ $anioProyectado }}</h3>
-                <p class="text-emerald-100 text-lg">Déjanos tus datos y un compañero de nuestro equipo se pondrá en contacto contigo para apoyarte en tu inscripción.</p>
+                <h3 class="text-3xl font-black mb-3">Únete a la Formación Docente {{ $anioProyectado }}</h3>
+                <p class="text-emerald-100 text-lg">Déjanos tus datos y nos pondremosen contacto contigo para apoyarte en tu matrícula.</p>
             </div>
             <form action="{{ route('interesados.store') }}" method="POST" class="bg-white p-8 rounded-2xl text-gray-800 shadow-lg">
                 @csrf

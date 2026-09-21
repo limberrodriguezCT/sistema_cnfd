@@ -68,10 +68,10 @@ class AcademicoSeeder extends Seeder
 
         // 4. Módulos de Tecnología Educativa
         $modulos_tete = [
-            ['nombre' => 'Diseño de recursos educativos digitales', 'semestre' => 'I Semestre 2026', 'orden' => 1],
-            ['nombre' => 'Creación de recursos educativos digitales', 'semestre' => 'I Semestre 2026', 'orden' => 2],
-            ['nombre' => 'Integración de tecnologías emergentes en recursos educativos', 'semestre' => 'II Semestre 2026', 'orden' => 3],
-            ['nombre' => 'Integración de recursos educativos en el proceso formativo', 'semestre' => 'II Semestre 2026', 'orden' => 4],
+            ['nombre' => 'Diseño de recursos educativos digitales', 'semestre' => 'I Semestre', 'orden' => 1],
+            ['nombre' => 'Creación de recursos educativos digitales', 'semestre' => 'I Semestre', 'orden' => 2],
+            ['nombre' => 'Integración de tecnologías emergentes en recursos educativos', 'semestre' => 'II Semestre', 'orden' => 3],
+            ['nombre' => 'Integración de recursos educativos en el proceso formativo', 'semestre' => 'II Semestre', 'orden' => 4],
         ];
 
         foreach ($modulos_tete as $mod) {
@@ -85,10 +85,10 @@ class AcademicoSeeder extends Seeder
 
         // 5. Módulos de Docencia de Educación Técnica (Extraídos del informe CNFDI)
         $modulos_tedetfp = [
-            ['nombre' => 'Creatividad y emprendimiento', 'semestre' => 'I Semestre 2026', 'orden' => 1],
-            ['nombre' => 'English A2 Waystage', 'semestre' => 'I Semestre 2026', 'orden' => 2],
-            ['nombre' => 'Promoción de valores', 'semestre' => 'II Semestre 2026', 'orden' => 3],
-            ['nombre' => 'Identidad historica y socicultural de Nicaragua', 'semestre' => 'II Semestre 2026', 'orden' => 4],
+            ['nombre' => 'Creatividad y emprendimiento', 'semestre' => 'I Semestre', 'orden' => 1],
+            ['nombre' => 'English A2 Waystage', 'semestre' => 'I Semestre', 'orden' => 2],
+            ['nombre' => 'Promoción de valores', 'semestre' => 'II Semestre', 'orden' => 3],
+            ['nombre' => 'Identidad historica y socicultural de Nicaragua', 'semestre' => 'II Semestre|', 'orden' => 4],
         ];
 
         foreach ($modulos_tedetfp as $mod) {

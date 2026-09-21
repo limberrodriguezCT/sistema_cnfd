@@ -178,14 +178,12 @@ class AsesorController extends Controller
 
         $spreadsheet = new Spreadsheet(); 
         
-        // CONFIGURACIÓN DE FUENTE GLOBAL (Arial 7)
         $spreadsheet->getDefaultStyle()->getFont()->setName('Arial');
         $spreadsheet->getDefaultStyle()->getFont()->setSize(7);
 
         $sheet = $spreadsheet->getActiveSheet(); 
         $sheet->setTitle('Listado Oficial');
 
-        // Títulos Principales (Tamaño 9)
         $sheet->setCellValue('A1', 'INSTITUTO NACIONAL TÉCNICO Y TECNOLÓGICO');
         $sheet->mergeCells('A1:I1');
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(9);
@@ -201,7 +199,6 @@ class AsesorController extends Controller
         $sheet->getStyle('A3')->getFont()->setBold(true)->setSize(9);
         $sheet->getStyle('A3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        // Bloque de Información del Grupo
         $anioAcademico = $grupo->anio_academico ?? date('Y');
         $anioCorto = substr($anioAcademico, -2);
         $passwordGenerica = "Inatec" . $anioCorto . "*";
@@ -232,7 +229,6 @@ class AsesorController extends Controller
         $sheet->getStyle('A4:A10')->getFont()->setBold(true);
         $sheet->getStyle('F4')->getFont()->setBold(true);
 
-        // Encabezados de la Tabla
         $headers = [
             'No', 
             'N° ÚNICO DE PERSONA', 
@@ -254,7 +250,6 @@ class AsesorController extends Controller
         
         $sheet->getRowDimension(11)->setRowHeight(30);
 
-        // Inserción de Datos
         $rowNum = 12; 
         $index = 1;
         
@@ -300,7 +295,6 @@ class AsesorController extends Controller
             $rowNum++;
         }
 
-        // Anchos de Columna ajustados
         $sheet->getColumnDimension('A')->setWidth(4);
         $sheet->getColumnDimension('B')->setWidth(18);
         $sheet->getColumnDimension('C')->setWidth(35);
@@ -611,6 +605,108 @@ class AsesorController extends Controller
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="Informe_Avance_CNFDI_'.$anioActivo.'.xlsx"');
+        header('Cache-Control: max-age=0');
+        $writer = new Xlsx($spreadsheet); 
+        $writer->save('php://output'); 
+        exit;
+    }
+
+    // ==========================================
+    // NUEVO MÉTODO: EXPORTAR INTERESADOS A EXCEL
+    // ==========================================
+    public function exportarInteresados(Request $request) {
+        $anioActivo = session('anio_activo', date('Y'));
+        
+        $interesados = Interesado::with('carrera')
+            ->where('anio_proyectado', $anioActivo)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $agrupados = $interesados->groupBy(function($item) {
+            return $item->carrera->nombre ?? 'Sin Carrera Específica';
+        });
+
+        $spreadsheet = new Spreadsheet(); 
+        $spreadsheet->getDefaultStyle()->getFont()->setName('Arial')->setSize(10);
+        $spreadsheet->removeSheetByIndex(0); 
+
+        $sheetIndex = 0;
+
+        if ($agrupados->isEmpty()) {
+            $sheet = $spreadsheet->createSheet($sheetIndex);
+            $sheet->setTitle('Sin Datos');
+            $sheet->setCellValue('A1', 'No hay registros de interesados para el año ' . $anioActivo);
+        } else {
+            foreach ($agrupados as $nombreCarrera => $lista) {
+                $sheet = $spreadsheet->createSheet($sheetIndex);
+                
+                $tituloHoja = substr(preg_replace('/[*\:\/\\\\\?\[\]]/', '', mb_strtoupper($nombreCarrera, 'UTF-8')), 0, 31);
+                $sheet->setTitle($tituloHoja);
+
+                $sheet->setCellValue('A1', 'INSTITUTO NACIONAL TÉCNICO Y TECNOLÓGICO');
+                $sheet->mergeCells('A1:F1');
+                $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(11);
+                $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+                $sheet->setCellValue('A2', 'CENTRO TECNOLÓGICO OLOF PALME, ESTELÍ - INATEC');
+                $sheet->mergeCells('A2:F2');
+                $sheet->getStyle('A2')->getFont()->setBold(true)->setSize(11);
+                $sheet->getStyle('A2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+                $sheet->setCellValue('A3', 'LISTADO DE INTERESADOS WEB - AÑO ' . $anioActivo);
+                $sheet->mergeCells('A3:F3');
+                $sheet->getStyle('A3')->getFont()->setBold(true)->setSize(11);
+                $sheet->getStyle('A3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+                $sheet->setCellValue('A5', 'OFERTA FORMATIVA:');
+                $sheet->setCellValue('B5', mb_strtoupper($nombreCarrera, 'UTF-8'));
+                $sheet->getStyle('A5')->getFont()->setBold(true);
+
+                $headers = ['N°', 'FECHA DE REGISTRO', 'NOMBRE DEL INTERESADO', 'CORREO ELECTRÓNICO', 'TELÉFONO', 'MODALIDAD'];
+                $sheet->fromArray($headers, NULL, 'A7');
+                
+                $sheet->getStyle('A7:F7')->getFont()->setBold(true);
+                $sheet->getStyle('A7:F7')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('A7:F7')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFBDD7EE');
+                $sheet->getStyle('A7:F7')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+
+                $rowNum = 8; 
+                $index = 1;
+                
+                foreach ($lista as $int) {
+                    $nombre = $int->nombre ?? $int->name ?? $int->nombre_completo ?? '';
+                    $correo = $int->correo ?? $int->email ?? '';
+                    
+                    $rowData = [
+                        $index++,
+                        $int->created_at ? $int->created_at->format('d/m/Y h:i A') : '',
+                        mb_strtoupper($nombre, 'UTF-8'),
+                        strtolower($correo),
+                        $int->telefono ?? '',
+                        mb_strtoupper($int->modalidad ?? 'No especificada', 'UTF-8')
+                    ];
+
+                    $sheet->fromArray($rowData, NULL, "A{$rowNum}");
+                    $sheet->getStyle("A{$rowNum}:F{$rowNum}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+                    
+                    $sheet->getStyle("A{$rowNum}:B{$rowNum}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                    $sheet->getStyle("E{$rowNum}:F{$rowNum}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+                    $rowNum++;
+                }
+
+                foreach (range('A', 'F') as $col) { 
+                    $sheet->getColumnDimension($col)->setAutoSize(true); 
+                }
+                
+                $sheetIndex++;
+            }
+        }
+
+        $spreadsheet->setActiveSheetIndex(0);
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="Interesados_Web_' . $anioActivo . '.xlsx"');
         header('Cache-Control: max-age=0');
         $writer = new Xlsx($spreadsheet); 
         $writer->save('php://output'); 

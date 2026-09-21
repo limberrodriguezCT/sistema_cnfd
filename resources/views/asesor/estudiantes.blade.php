@@ -53,6 +53,7 @@
                 <table class="w-full text-left text-sm border-collapse">
                     <thead>
                         <tr class="text-gray-500 border-b border-gray-200 uppercase text-xs tracking-wider">
+                            <th class="py-3 px-4 font-bold text-center w-12">N°</th>
                             <th class="py-3 px-4 font-bold">Protagonista</th>
                             <th class="py-3 px-4 font-bold">Correo</th>
                             <th class="py-3 px-4 font-bold">Procedencia</th>
@@ -64,30 +65,36 @@
                         @if(count($estudiantes) > 0)
                             @foreach($estudiantes as $est)
                                 <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors {{ $est->trashed() ? 'opacity-50' : '' }}">
-                                    <td class="py-4 px-4 font-bold text-gray-800">{{ $est->name }}</td>
-                                    <td class="py-4 px-4 text-gray-600">{{ $est->email }}</td>
-                                    <td class="py-4 px-4 text-gray-600 font-medium text-xs">{{ $est->procedencia }}</td>
-                                    <td class="py-4 px-4 text-center">
+                                    <td class="py-4 px-4 font-black text-gray-400 text-center text-sm align-middle border-r border-gray-50">{{ $loop->iteration }}</td>
+                                    <td class="py-4 px-4 font-bold text-gray-800 align-middle">{{ $est->name }}</td>
+                                    <td class="py-4 px-4 text-gray-600 align-middle">{{ $est->email }}</td>
+                                    <td class="py-4 px-4 text-gray-600 font-medium text-xs align-middle">{{ $est->procedencia }}</td>
+                                    <td class="py-4 px-4 text-center align-middle">
                                         @if($est->trashed())
-                                            <span class="bg-red-100 text-red-700 px-2 py-1 rounded font-bold text-xs uppercase">Retirado</span>
+                                            <span class="bg-red-100 text-red-700 px-2 py-1 rounded font-bold text-xs uppercase inline-block">Retirado</span>
                                         @else
-                                            <span class="bg-green-100 text-green-700 px-2 py-1 rounded font-bold text-xs uppercase">Activo</span>
+                                            <span class="bg-green-100 text-green-700 px-2 py-1 rounded font-bold text-xs uppercase inline-block">Activo</span>
                                         @endif
                                     </td>
-                                    <td class="py-4 px-4 text-center flex justify-center gap-2">
-                                        <button onclick="editarEstudiante({{ $est->id }}, '{{ addslashes($est->name) }}', '{{ addslashes($est->email) }}', '{{ addslashes($est->procedencia) }}')" class="bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold py-1 px-3 rounded-lg text-xs transition-colors">Editar</button>
-                                        <form action="{{ route('asesor.toggle_estudiante', $est->id) }}" method="POST" class="inline-block">
-                                            @csrf
-                                            <button type="submit" class="{{ $est->trashed() ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100' : 'bg-red-50 text-red-600 hover:bg-red-100' }} font-bold py-1 px-3 rounded-lg text-xs transition-colors">
-                                                {{ $est->trashed() ? 'Activar' : 'Retirar' }}
-                                            </button>
-                                        </form>
+                                    <td class="py-4 px-4 align-middle">
+                                        <!-- DIV FLEXBOX para que queden alineados horizontalmente -->
+                                        <div class="flex items-center justify-center gap-2">
+                                            <button onclick="editarEstudiante({{ $est->id }}, '{{ addslashes($est->name) }}', '{{ addslashes($est->email) }}', '{{ addslashes($est->procedencia) }}')" class="bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold py-1 px-3 rounded-lg text-xs transition-colors">Editar</button>
+                                            
+                                            <!-- RUTA CORREGIDA: asesor.toggle_estudiante -->
+                                            <form action="{{ route('asesor.toggle_estudiante', $est->id) }}" method="POST" class="m-0">
+                                                @csrf
+                                                <button type="submit" class="{{ $est->trashed() ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100' : 'bg-red-50 text-red-600 hover:bg-red-100' }} font-bold py-1 px-3 rounded-lg text-xs transition-colors">
+                                                    {{ $est->trashed() ? 'Activar' : 'Retirar' }}
+                                                </button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach
                         @else
                             <tr>
-                                <td colspan="5" class="py-12 text-center text-gray-500 font-medium border-2 border-dashed rounded-xl">No hay protagonistas matriculados en este grupo.</td>
+                                <td colspan="6" class="py-12 text-center text-gray-500 font-medium border-2 border-dashed rounded-xl align-middle">No hay protagonistas matriculados en este grupo.</td>
                             </tr>
                         @endif
                     </tbody>
@@ -106,6 +113,7 @@
     <div id="modalImportar" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md">
             <h3 class="font-black text-gray-800 mb-6 border-b pb-4 text-xl">Importar Matrícula INATEC</h3>
+            <!-- RUTA CORREGIDA: asesor.importar_estudiantes -->
             <form action="{{ route('asesor.importar_estudiantes') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" name="grupo_id" value="{{ $grupoActivo }}">
@@ -128,6 +136,7 @@
     <div id="modalManual" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <h3 class="font-black text-gray-800 mb-4 border-b pb-2 text-xl">Agregar Estudiante</h3>
+            <!-- RUTA CORREGIDA: asesor.store_estudiante -->
             <form action="{{ route('asesor.store_estudiante') }}" method="POST">
                 @csrf
                 <input type="hidden" name="grupo_id" value="{{ $grupoActivo }}">

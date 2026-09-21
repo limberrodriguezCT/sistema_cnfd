@@ -38,6 +38,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/estudiantes/exportar/{grupo_id}', [AsesorController::class, 'exportarListado'])->name('exportar_listado');
         Route::get('/exportar-global', [AsesorController::class, 'exportarConsolidadoGlobal'])->name('exportar_global');
         
+        // RUTA NUEVA: Exportación de Interesados
+        Route::get('/interesados/exportar', [AsesorController::class, 'exportarInteresados'])->name('exportar_interesados');
+        
         Route::post('/estudiante', [AsesorController::class, 'storeEstudianteManual'])->name('store_estudiante');
         Route::put('/estudiante/{id}', [AsesorController::class, 'updateEstudiante'])->name('update_estudiante');
         Route::post('/estudiante/{id}/toggle', [AsesorController::class, 'toggleEstudiante'])->name('toggle_estudiante');
@@ -66,7 +69,6 @@ Route::middleware('auth')->group(function () {
     // ==========================================
     Route::prefix('docente')->name('docente.')->group(function () {
         Route::get('/panel', [DocenteController::class, 'panel'])->name('panel');
-        // AQUÍ ESTÁ LA RUTA QUE FALTABA Y CAUSABA EL ERROR 500:
         Route::get('/espacio/{asignacion_id}', [DocenteController::class, 'espacio'])->name('espacio');
         
         Route::post('/procesar/{asignacion_id}', [DocenteController::class, 'procesarAvance'])->name('procesar');

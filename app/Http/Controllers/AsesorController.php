@@ -170,40 +170,153 @@ class AsesorController extends Controller
 
     public function exportarListado($grupo_id) {
         $grupo = Grupo::with('carrera')->findOrFail($grupo_id);
-        $estudiantes = User::where('rol', 'estudiante')->where('grupo_id', $grupo_id)->withTrashed()->orderBy('name', 'asc')->get();
+        $estudiantes = User::where('rol', 'estudiante')
+            ->where('grupo_id', $grupo_id)
+            ->whereNull('deleted_at')
+            ->orderBy('name', 'asc')
+            ->get();
 
-        $spreadsheet = new Spreadsheet(); $sheet = $spreadsheet->getActiveSheet(); $sheet->setTitle('Listado Oficial');
-        $sheet->setCellValue('D1', 'INSTITUTO NACIONAL TÉCNICO Y TECNOLÓGICO'); $sheet->setCellValue('D2', 'CENTRO TECNOLOGICO OLOF PALME, ESTELI - INATEC.'); $sheet->setCellValue('D3', 'LISTADO ESTUDIANTE/PROTAGONISTA POR GRUPO');
-        $sheet->getStyle('D1:D3')->getFont()->setBold(true)->setSize(11); $sheet->getStyle('D1:D3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $spreadsheet = new Spreadsheet(); 
+        
+        // CONFIGURACIÓN DE FUENTE GLOBAL (Arial 7)
+        $spreadsheet->getDefaultStyle()->getFont()->setName('Arial');
+        $spreadsheet->getDefaultStyle()->getFont()->setSize(7);
 
-        $sheet->setCellValue('A5', 'Oferta:'); $sheet->setCellValue('B5', date('Y'));
-        $sheet->setCellValue('A6', 'Sector:'); $sheet->setCellValue('B6', 'Comercio y Servicio');
-        $sheet->setCellValue('A7', 'Evento:'); $sheet->setCellValue('B7', mb_strtoupper($grupo->carrera->nombre ?? 'N/A', 'UTF-8'));
-        $sheet->setCellValue('A8', 'Estructura Formativa:'); $sheet->setCellValue('B8', 'Virtual / Presencial');
-        $sheet->setCellValue('G5', 'Grupo:'); $sheet->setCellValue('H5', mb_strtoupper($grupo->codigo_grupo, 'UTF-8'));
-        $sheet->setCellValue('G6', 'Año a cursar:'); $sheet->setCellValue('H6', '1');
-        $sheet->getStyle('A5:A8')->getFont()->setBold(true); $sheet->getStyle('G5:G6')->getFont()->setBold(true);
+        $sheet = $spreadsheet->getActiveSheet(); 
+        $sheet->setTitle('Listado Oficial');
 
-        $headers = ['No', 'N° ÚNICO DE PERSONA', 'NOMBRE DEL PARTICIPANTE', 'Cédula', 'MAT. CASO ESPECIAL', 'ESTADO', 'TELEFONO', 'TIPO DE BECA', 'LUGAR DE TRABAJO / PROCEDENCIA', 'CORREO ELECTRÓNICO'];
+        // Títulos Principales (Tamaño 9)
+        $sheet->setCellValue('A1', 'INSTITUTO NACIONAL TÉCNICO Y TECNOLÓGICO');
+        $sheet->mergeCells('A1:I1');
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(9);
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $sheet->setCellValue('A2', 'CENTRO TECNOLOGICO OLOF PALME, ESTELI - INATEC.');
+        $sheet->mergeCells('A2:I2');
+        $sheet->getStyle('A2')->getFont()->setBold(true)->setSize(9);
+        $sheet->getStyle('A2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $sheet->setCellValue('A3', 'LISTADO ESTUDIANTE/PROTAGONISTA POR GRUPO');
+        $sheet->mergeCells('A3:I3');
+        $sheet->getStyle('A3')->getFont()->setBold(true)->setSize(9);
+        $sheet->getStyle('A3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        // Bloque de Información del Grupo
+        $anioAcademico = $grupo->anio_academico ?? date('Y');
+        $anioCorto = substr($anioAcademico, -2);
+        $passwordGenerica = "Inatec" . $anioCorto . "*";
+
+        $sheet->setCellValue('A4', 'Oferta:');
+        $sheet->setCellValue('B4', $anioAcademico . ' (id:' . $grupo->id . ')'); 
+        $sheet->setCellValue('D4', mb_strtoupper($grupo->codigo_grupo, 'UTF-8'));
+        $sheet->setCellValue('F4', 'Grupos de procedencia:');
+
+        $sheet->setCellValue('A5', 'Sector:');
+        $sheet->setCellValue('B5', 'Comercio y Servicio'); 
+        $sheet->setCellValue('D5', '1'); 
+
+        $sheet->setCellValue('A6', 'Evento:');
+        $sheet->setCellValue('B6', mb_strtoupper($grupo->carrera->nombre ?? 'N/A', 'UTF-8'));
+        $sheet->setCellValue('D6', 'CT OLOF PALME');
+
+        $sheet->setCellValue('A7', 'Estructura Formativa:');
+        $sheet->setCellValue('B7', mb_strtoupper($grupo->modalidad ?? 'VIRTUAL', 'UTF-8'));
+
+        $sheet->setCellValue('A8', 'Docente Guia:');
+        
+        $sheet->setCellValue('A9', 'Duración:');
+        $sheet->setCellValue('D9', 'Turno:');
+        
+        $sheet->setCellValue('A10', 'Docente del Módulo:');
+
+        $sheet->getStyle('A4:A10')->getFont()->setBold(true);
+        $sheet->getStyle('F4')->getFont()->setBold(true);
+
+        // Encabezados de la Tabla
+        $headers = [
+            'No', 
+            'N° ÚNICO DE PERSONA', 
+            'NOMBRE DEL PARTICIPANTE', 
+            'TELEFONO', 
+            'TIPO DE BECA', 
+            'LUGAR DE TRABAJO', 
+            'CORREO ELECTRÓNICO', 
+            'USUARIO', 
+            'CONTRASEÑA'
+        ];
+        
         $sheet->fromArray($headers, NULL, 'A11');
-        $sheet->getStyle('A11:J11')->getFont()->setBold(true); $sheet->getStyle('A11:J11')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER);
-        $sheet->getStyle('A11:J11')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+        $sheet->getStyle('A11:I11')->getFont()->setBold(true);
+        $sheet->getStyle('A11:I11')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A11:I11')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet->getStyle('A11:I11')->getAlignment()->setWrapText(true);
+        $sheet->getStyle('A11:I11')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+        
+        $sheet->getRowDimension(11)->setRowHeight(30);
 
-        $rowNum = 12; $index = 1;
+        // Inserción de Datos
+        $rowNum = 12; 
+        $index = 1;
+        
         foreach ($estudiantes as $est) {
-            $estado = $est->trashed() ? 'Retirado' : 'Activo';
-            $rowData = [$index++, strtoupper(substr(md5($est->id), 0, 8)), $est->name, $est->cedula ?? '-', '', $estado, $est->telefono ?? '-', 'BECA NACIONAL', $est->procedencia, $est->email];
+            $correo = strtolower(trim($est->email ?? ''));
+            $usuario = 'no encontrado';
+            $pass = '';
+            
+            if (!empty($correo)) {
+                $usuario = explode('@', $correo)[0];
+                $pass = $passwordGenerica;
+            }
+
+            $rowData = [
+                $index++,
+                $est->numero_unico ?? strtoupper(substr(md5($est->id), 0, 8)), 
+                mb_strtoupper($est->name, 'UTF-8'),
+                $est->telefono ?? '',
+                'BECA NACIONAL',
+                mb_strtoupper($est->procedencia ?? '', 'UTF-8'),
+                $correo,
+                $usuario,
+                $pass 
+            ];
+
             $sheet->fromArray($rowData, NULL, "A{$rowNum}");
-            $sheet->getStyle("A{$rowNum}:J{$rowNum}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
-            $sheet->getStyle("A{$rowNum}:F{$rowNum}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle("A{$rowNum}:I{$rowNum}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+            
+            $sheet->getStyle("A{$rowNum}:I{$rowNum}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+            $sheet->getStyle("A{$rowNum}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle("B{$rowNum}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle("D{$rowNum}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            
+            $sheet->getStyle("C{$rowNum}")->getAlignment()->setWrapText(true);
+            $sheet->getStyle("F{$rowNum}")->getAlignment()->setWrapText(true);
+            $sheet->getStyle("G{$rowNum}")->getAlignment()->setWrapText(true);
+            
+            $sheet->getStyle("H{$rowNum}:I{$rowNum}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle("H{$rowNum}:I{$rowNum}")->getFont()->setBold(true);
+
+            $sheet->getRowDimension($rowNum)->setRowHeight(25);
+
             $rowNum++;
         }
-        foreach (range('B', 'J') as $col) { $sheet->getColumnDimension($col)->setAutoSize(true); }
+
+        // Anchos de Columna ajustados
+        $sheet->getColumnDimension('A')->setWidth(4);
+        $sheet->getColumnDimension('B')->setWidth(18);
+        $sheet->getColumnDimension('C')->setWidth(35);
+        $sheet->getColumnDimension('D')->setWidth(12);
+        $sheet->getColumnDimension('E')->setWidth(16);
+        $sheet->getColumnDimension('F')->setWidth(35);
+        $sheet->getColumnDimension('G')->setWidth(35);
+        $sheet->getColumnDimension('H')->setWidth(20);
+        $sheet->getColumnDimension('I')->setWidth(12);
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="Listado_Oficial_' . strtoupper($grupo->codigo_grupo) . '.xlsx"');
         header('Cache-Control: max-age=0');
-        $writer = new Xlsx($spreadsheet); $writer->save('php://output'); exit;
+        $writer = new Xlsx($spreadsheet); 
+        $writer->save('php://output'); 
+        exit;
     }
 
     public function exportarConsolidadoGlobal(Request $request) {

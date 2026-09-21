@@ -159,7 +159,7 @@
                         <option value="INATEC">INATEC</option>
                         <option value="MINED">MINED</option>
                         <option value="SETEC">SETEC / Universidades</option>
-                        <option value="OTRAS INSTITUCIONES">Otras Instituciones (ONGs, etc.)</option>
+                        <option value="OTRAS INSTITUCIONES">Otras Instituciones</option>
                         <option value="PÚBLICO GENERAL">Público General</option>
                     </select>
                 </div>
@@ -210,7 +210,7 @@
 
                 <!-- Campos dinámicos para OTRAS INSTITUCIONES -->
                 <div id="campos_otras_add" class="mb-6 hidden">
-                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nombre de la Institución / ONG</label>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nombre de la Institución</label>
                     <input type="text" name="otra_institucion" id="otra_inst_add" placeholder="Ej. INPRHU" class="w-full text-sm p-3 border border-gray-300 rounded-xl bg-gray-50">
                 </div>
 
@@ -248,7 +248,7 @@
                         <option value="INATEC">INATEC</option>
                         <option value="MINED">MINED</option>
                         <option value="SETEC">SETEC / Universidades</option>
-                        <option value="OTRAS INSTITUCIONES">Otras Instituciones (ONGs, etc.)</option>
+                        <option value="OTRAS INSTITUCIONES">Otras Instituciones</option>
                         <option value="PÚBLICO GENERAL">Público General</option>
                     </select>
                 </div>
@@ -299,7 +299,7 @@
 
                 <!-- Campos dinámicos para OTRAS INSTITUCIONES (Edit) -->
                 <div id="campos_otras_edit" class="mb-6 hidden">
-                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nombre de la Institución / ONG</label>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nombre de la Institución</label>
                     <input type="text" name="otra_institucion" id="otra_inst_edit" class="w-full text-sm p-3 border border-gray-300 rounded-xl bg-gray-50">
                 </div>
 

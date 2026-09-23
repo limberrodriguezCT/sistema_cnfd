@@ -61,12 +61,15 @@
             <h1 class="text-4xl md:text-6xl font-black mb-6 tracking-tight leading-tight">Centro Nacional de Formación Docente Olof Palme <span class="text-blue-300"><?php echo $anioProyectado ?? date('Y'); ?></span></h1>
             <p class="text-blue-100 text-lg md:text-xl mb-10 max-w-2xl mx-auto">Impulsa tu vocación docente.</p>
             
+       
             <div class="flex flex-col sm:flex-row justify-center gap-4">
                 <a href="#oferta-formativa" class="bg-white text-[#2a348e] hover:bg-gray-100 font-black px-8 py-4 rounded-xl shadow-lg transition-transform transform hover:-translate-y-1">Ver Oferta Formativa</a>
+                <!--
                 <a href="{{ route('login') }}" class="text-white hover:bg-white/10 border-2 border-white/40 font-black px-8 py-4 rounded-xl transition-colors backdrop-blur-sm">INICIO DE SESIÓN</a>
-            </div>
+                --->
+            </div> 
         </div>
-    </header>
+    </header> 
 
     <main class="max-w-6xl mx-auto px-6 py-16 space-y-24">
         

@@ -57,19 +57,16 @@
             </svg>
         </div>
         <div class="max-w-4xl mx-auto text-center relative z-10">
-            <span class="bg-blue-600/30 text-blue-200 border border-blue-400/30 px-4 py-1.5 rounded-full text-sm font-black tracking-widest uppercase mb-6 inline-block">Oferta Formativa</span>
+            <span class="bg-blue-600/30 text-blue-200 border border-blue-400/30 px-4 py-1.5 rounded-full text-sm font-black tracking-widest uppercase mb-6 inline-block">Convocatoria Abierta</span>
             <h1 class="text-4xl md:text-6xl font-black mb-6 tracking-tight leading-tight">Centro Nacional de Formación Docente Olof Palme <span class="text-blue-300"><?php echo $anioProyectado ?? date('Y'); ?></span></h1>
-            <p class="text-blue-100 text-lg md:text-xl mb-10 max-w-2xl mx-auto">Impulsa tu vocación docente.</p>
+            <p class="text-blue-100 text-lg md:text-xl mb-10 max-w-2xl mx-auto">Impulsa tu carrera docente con nuestras especialidades técnicas diseñadas para la excelencia educativa.</p>
             
-       
             <div class="flex flex-col sm:flex-row justify-center gap-4">
-                <a href="#oferta-formativa" class="bg-white text-[#2a348e] hover:bg-gray-100 font-black px-8 py-4 rounded-xl shadow-lg transition-transform transform hover:-translate-y-1">Ver Oferta Formativa</a>
-                <!--
-                <a href="{{ route('login') }}" class="text-white hover:bg-white/10 border-2 border-white/40 font-black px-8 py-4 rounded-xl transition-colors backdrop-blur-sm">INICIO DE SESIÓN</a>
-                --->
-            </div> 
+                <a href="#formulario-interesados" class="bg-white text-[#2a348e] hover:bg-gray-100 font-black px-8 py-4 rounded-xl shadow-lg transition-transform transform hover:-translate-y-1">Matriculate</a>
+                <a href="#oferta-formativa" class="text-white hover:bg-white/10 border-2 border-white/40 font-black px-8 py-4 rounded-xl transition-colors backdrop-blur-sm">Ver Oferta Formativa</a>
+            </div>
         </div>
-    </header> 
+    </header>
 
     <main class="max-w-6xl mx-auto px-6 py-16 space-y-24">
         
@@ -238,7 +235,10 @@
 
     <!-- Footer -->
     <footer class="bg-gray-900 text-gray-400 py-8 text-center text-sm font-medium">
-        <p>&copy; <?php echo date('Y'); ?> INATEC - Centro Nacional de Formación Docente Olof Palme.</p>
+        <p>
+            <a href="{{ route('login') }}" class="cursor-default focus:outline-none">&copy; <?php echo date('Y'); ?></a> 
+            INATEC - Centro Nacional de Formación Docente Olof Palme.
+        </p>
     </footer>
 
     <!-- Scripts de Swiper JS y Lógica Dinámica -->
@@ -303,20 +303,17 @@
             }
         };
 
-        // Función para actualizar la interfaz del detalle
         function actualizarDetalles(key) {
             const data = infoCarreras[key];
             if(!data) return;
 
             const panel = document.getElementById('detalles-oferta');
             
-            // Efecto suave
             panel.classList.remove('fade-in');
-            void panel.offsetWidth; // Trigger reflow
+            void panel.offsetWidth;
             panel.classList.add('fade-in');
 
             document.getElementById('badge-tipo').textContent = data.tipo;
-            // Cambiar color del badge dependiendo si es curso o carrera
             if(data.tipo === 'CURSO') {
                 document.getElementById('badge-tipo').className = 'bg-purple-100 text-purple-800 text-[10px] font-black px-3 py-1 rounded-md uppercase mb-3 inline-block tracking-widest';
             } else {
@@ -325,7 +322,6 @@
 
             document.getElementById('titulo-oferta').textContent = data.titulo;
 
-            // Renderizar perfil
             const listaPerfil = document.getElementById('lista-perfil');
             listaPerfil.innerHTML = '';
             data.perfil.forEach(item => {
@@ -335,7 +331,6 @@
                 listaPerfil.appendChild(li);
             });
 
-            // Renderizar cargos
             const listaCargos = document.getElementById('lista-cargos');
             listaCargos.innerHTML = '';
             data.cargos.forEach(item => {
@@ -346,7 +341,6 @@
             });
         }
 
-        // Inicializar Swiper
         document.addEventListener('DOMContentLoaded', function () {
             var swiper = new Swiper(".mySwiper", {
                 effect: "coverflow",
@@ -364,22 +358,19 @@
                     el: ".swiper-pagination",
                     clickable: true,
                 },
-                initialSlide: 1, // Empieza centrado en Tecnología Educativa
+                initialSlide: 1, 
                 on: {
                     init: function () {
-                        // Cargar datos del slide inicial
                         const activeSlide = this.slides[this.activeIndex];
                         actualizarDetalles(activeSlide.getAttribute('data-id'));
                     },
                     slideChange: function () {
-                        // Actualizar datos al cambiar de slide
                         const activeSlide = this.slides[this.activeIndex];
                         actualizarDetalles(activeSlide.getAttribute('data-id'));
                     }
                 }
             });
 
-            // Permitir clic en los slides inactivos para centrarlos
             swiper.slides.forEach((slide, index) => {
                 slide.addEventListener('click', () => {
                     swiper.slideTo(index);
@@ -387,7 +378,6 @@
             });
         });
 
-        // Alerta de éxito de SweetAlert2
         <?php if(session('success')): ?>
             Swal.fire({
                 icon: 'success',

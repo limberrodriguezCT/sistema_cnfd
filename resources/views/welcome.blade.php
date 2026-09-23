@@ -59,7 +59,6 @@
         <div class="max-w-4xl mx-auto text-center relative z-10">
             <span class="bg-blue-600/30 text-blue-200 border border-blue-400/30 px-4 py-1.5 rounded-full text-sm font-black tracking-widest uppercase mb-6 inline-block">Oferta Formativa</span>
             <h1 class="text-4xl md:text-6xl font-black mb-6 tracking-tight leading-tight">Centro Nacional de Formación Docente Olof Palme <span class="text-blue-300"><?php echo $anioProyectado ?? date('Y'); ?></span></h1>
-            <p class="text-blue-100 text-lg md:text-xl mb-10 max-w-2xl mx-auto">Impulsa tu carrera docente con nuestras especialidades técnicas diseñadas para la excelencia educativa.</p>
             
             <div class="flex flex-col sm:flex-row justify-center gap-4">
                 <a href="#formulario-interesados" class="bg-white text-[#2a348e] hover:bg-gray-100 font-black px-8 py-4 rounded-xl shadow-lg transition-transform transform hover:-translate-y-1">Matriculate</a>
